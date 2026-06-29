@@ -17,7 +17,7 @@ serve(async (req) => {
     if (!id) return new Response(JSON.stringify({ error: 'Missing id' }), { status: 400, headers: cors });
 
     const res = await fetch(`${DID_BASE}/talks/${id}`, {
-      headers: { 'Authorization': `Basic ${btoa(DID_API_KEY + ':')}` },
+      headers: { 'Authorization': `Basic ${btoa(DID_API_KEY)}` },
     });
 
     const data = await res.json();

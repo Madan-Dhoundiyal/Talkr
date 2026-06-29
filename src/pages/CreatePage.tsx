@@ -1,7 +1,6 @@
 import { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Video, Upload, Mic, FileText, Loader2, Play, Download, ChevronDown, LayoutDashboard } from 'lucide-react';
-import { supabase } from '../lib/supabase';
 
 const PRESET_AVATARS = [
   { id: 'anna', name: 'Anna', url: 'https://d-id-public-bucket.s3.us-east-1.amazonaws.com/alice.jpg' },
@@ -46,16 +45,10 @@ export default function CreatePage() {
     setErrorMsg('');
     setVideoUrl(null);
 
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) { setErrorMsg('Not authenticated.'); setStatus('error'); return; }
-
     try {
-      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-talk`, {
+      const res = await fetch('/api/generate-talk', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sourceUrl: avatarUrl, script: script.trim(), voice }),
       });
 
@@ -70,10 +63,7 @@ export default function CreatePage() {
         attempts++;
         if (attempts > 30) { setErrorMsg('Timed out. Try again.'); setStatus('error'); return; }
 
-        const pollRes = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-talk?id=${talkId}`,
-          { headers: { 'Authorization': `Bearer ${session.access_token}` } }
-        );
+        const pollRes = await fetch(`/api/get-talk?id=${talkId}`);
         const pollData = await pollRes.json();
 
         if (pollData.status === 'done') {

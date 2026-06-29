@@ -18,7 +18,7 @@ serve(async (req) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Basic ${btoa(DID_API_KEY + ':')}`,
+        'Authorization': `Basic ${btoa(DID_API_KEY)}`,
       },
       body: JSON.stringify({
         source_url: sourceUrl,
